@@ -1,0 +1,39 @@
+{
+	"name": "OpenGraphSimple",
+	"version": "0.1.0",
+	"author": [
+		"tesinormed"
+	],
+	"url": "https://www.mediawiki.org/wiki/Extension:OpenGraphSimple",
+	"descriptionmsg": "opengraphsimple-desc",
+	"license-name": "CC0-1.0",
+	"type": "other",
+	"requires": {
+		"platform": {
+			"php": ">= 8.1"
+		},
+		"MediaWiki": ">= 1.42.0",
+		"extensions": {
+			"Description2": "*",
+			"PageImages": "*"
+		}
+	},
+	"AutoloadNamespaces": {
+		"MediaWiki\\Extension\\OpenGraphSimple\\": "src/"
+	},
+	"HookHandlers": {
+		"main": {
+			"class": "MediaWiki\\Extension\\OpenGraphSimple\\Hooks"
+		}
+	},
+	"Hooks": {
+		"OutputPageParserOutput": "main"
+	},
+	"callback": "MediaWiki\\Extension\\OpenGraphSimple\\Hooks::onRegistration",
+	"MessagesDirs": {
+		"OpenGraphSimple": [
+			"i18n"
+		]
+	},
+	"manifest_version": 2
+}
