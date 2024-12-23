@@ -6,6 +6,7 @@ use MediaWiki\Config\Config;
 use MediaWiki\Config\ConfigFactory;
 use MediaWiki\Hook\OutputPageParserOutputHook;
 use MediaWiki\MainConfigNames;
+use PageImages\PageImages;
 use RuntimeException;
 
 class Hooks implements OutputPageParserOutputHook {
@@ -43,10 +44,12 @@ class Hooks implements OutputPageParserOutputHook {
 
 		$config = $outputPage->getConfig();
 		$title = $outputPage->getTitle();
+		$description = $parserOutput->getPageProperty( 'description' ) ?? '&hellip;';
 		$siteName = $config->get( MainConfigNames::Sitename );
 
 		$metaProperties = [];
 
+		// Open Graph
 		if ( $title->isMainPage() ) {
 			$metaProperties['og:title'] = $siteName;
 			$metaProperties['og:type'] = 'website';
@@ -59,9 +62,23 @@ class Hooks implements OutputPageParserOutputHook {
 		if ( $metaProperties['og:url'] === false ) {
 			$metaProperties['og:url'] = $title->getFullURL();
 		}
-		$metaProperties['og:description'] = $parserOutput->getPageProperty( 'description' );
+		$metaProperties['og:description'] = $description;
+
+		// Twitter card
+		$metaProperties['twitter:card'] = 'summary';
+		if ( $title->isMainPage() ) {
+			$metaProperties['twitter:title'] = $siteName;
+		} else {
+			$metaProperties['twitter:title'] = htmlspecialchars( $outputPage->getDisplayTitle() );
+		}
+		$metaProperties['twitter:description'] = $description;
+		$metaProperties['twitter:image'] = PageImages::getPageImage( $title )?->getFullUrl()
+			?? $outputPage->getConfig()->get( 'PageImagesOpenGraphFallbackImage' );
 
 		foreach ( $metaProperties as $property => $value ) {
+			if ( empty( $value ) ) {
+				continue;
+			}
 			$outputPage->addMeta( $property, $value );
 		}
 	}
