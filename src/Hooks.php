@@ -72,8 +72,10 @@ class Hooks implements OutputPageParserOutputHook {
 			$metaProperties['twitter:title'] = htmlspecialchars( $outputPage->getDisplayTitle() );
 		}
 		$metaProperties['twitter:description'] = $description;
-		$metaProperties['twitter:image'] = PageImages::getPageImage( $title )?->getFullUrl()
-			?? $outputPage->getConfig()->get( 'PageImagesOpenGraphFallbackImage' );
+		$metaProperties['twitter:image'] = PageImages::getPageImage( $title )->getFullUrl();
+		if ( $metaProperties['twitter:image'] === false ) {
+			$metaProperties['twitter:image'] = $outputPage->getConfig()->get( 'PageImagesOpenGraphFallbackImage' );
+		}
 
 		foreach ( $metaProperties as $property => $value ) {
 			if ( empty( $value ) ) {
