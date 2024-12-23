@@ -1,11 +1,20 @@
 <?php
+
 namespace MediaWiki\Extension\OpenGraphSimple;
 
+use MediaWiki\Config\Config;
+use MediaWiki\Config\ConfigFactory;
 use MediaWiki\Hook\OutputPageParserOutputHook;
 use MediaWiki\MainConfigNames;
 use RuntimeException;
 
 class Hooks implements OutputPageParserOutputHook {
+	private Config $extensionConfig;
+
+	public function __construct( ConfigFactory $configFactory ) {
+		$this->extensionConfig = $configFactory->makeConfig( 'opengraphsimple' );
+	}
+
 	/** @noinspection PhpUnused */
 	public static function onRegistration(): void {
 		global $wgPageImagesOpenGraph, $wgPageImagesOpenGraphFallbackImage;
@@ -24,6 +33,14 @@ class Hooks implements OutputPageParserOutputHook {
 	 * @inheritDoc
 	 */
 	public function onOutputPageParserOutput( $outputPage, $parserOutput ): void {
+		if ( !in_array(
+			needle: $outputPage->getTitle()->getNamespace(),
+			haystack: $this->extensionConfig->get( 'OpenGraphSimpleNamespaces' ),
+			strict: true
+		) ) {
+			return;
+		}
+
 		$config = $outputPage->getConfig();
 		$title = $outputPage->getTitle();
 		$siteName = $config->get( MainConfigNames::Sitename );
