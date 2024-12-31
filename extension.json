@@ -1,6 +1,6 @@
 {
 	"name": "OpenGraphSimple",
-	"version": "0.3.3",
+	"version": "0.4.0",
 	"author": [
 		"tesinormed"
 	],
@@ -22,19 +22,10 @@
 	"AutoloadNamespaces": {
 		"MediaWiki\\Extension\\OpenGraphSimple\\": "src/"
 	},
-	"config": {
-		"OpenGraphSimpleNamespaces": {
-			"value": [0]
-		}
-	},
-	"ConfigRegistry": {
-		"opengraphsimple": "GlobalVarConfig::newInstance"
-	},
 	"HookHandlers": {
 		"main": {
 			"class": "MediaWiki\\Extension\\OpenGraphSimple\\Hooks",
 			"services": [
-				"ConfigFactory"
 			]
 		}
 	},

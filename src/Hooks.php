@@ -2,20 +2,12 @@
 
 namespace MediaWiki\Extension\OpenGraphSimple;
 
-use MediaWiki\Config\Config;
-use MediaWiki\Config\ConfigFactory;
 use MediaWiki\Hook\OutputPageParserOutputHook;
 use MediaWiki\MainConfigNames;
 use PageImages\PageImages;
 use RuntimeException;
 
 class Hooks implements OutputPageParserOutputHook {
-	private Config $extensionConfig;
-
-	public function __construct( ConfigFactory $configFactory ) {
-		$this->extensionConfig = $configFactory->makeConfig( 'opengraphsimple' );
-	}
-
 	/** @noinspection PhpUnused */
 	public static function onRegistration(): void {
 		global $wgPageImagesOpenGraph, $wgPageImagesOpenGraphFallbackImage;
@@ -34,17 +26,9 @@ class Hooks implements OutputPageParserOutputHook {
 	 * @inheritDoc
 	 */
 	public function onOutputPageParserOutput( $outputPage, $parserOutput ): void {
-		if ( !in_array(
-			needle: $outputPage->getTitle()->getNamespace(),
-			haystack: $this->extensionConfig->get( 'OpenGraphSimpleNamespaces' ),
-			strict: true
-		) ) {
-			return;
-		}
-
 		$config = $outputPage->getConfig();
 		$title = $outputPage->getTitle();
-		$description = $parserOutput->getPageProperty( 'description' ) ?? '&hellip;';
+		$description = $parserOutput->getPageProperty( 'description' );
 		$image = PageImages::getPageImage( $title );
 		if ( !$image ) {
 			$image = $outputPage->getConfig()->get( 'PageImagesOpenGraphFallbackImage' );
@@ -78,7 +62,9 @@ class Hooks implements OutputPageParserOutputHook {
 		} else {
 			$metaProperties['twitter:title'] = htmlspecialchars( $outputPage->getDisplayTitle() );
 		}
-		$metaProperties['twitter:description'] = mb_strimwidth( $description, 0, 200, "&hellip;" );
+		if ( $description !== null ) {
+			$metaProperties['twitter:description'] = mb_strimwidth( $description, 0, 200, "&hellip;" );
+		}
 		$metaProperties['twitter:image'] = $image;
 
 		foreach ( $metaProperties as $property => $value ) {
