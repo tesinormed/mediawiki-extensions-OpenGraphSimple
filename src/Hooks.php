@@ -20,8 +20,8 @@ class Hooks implements OutputPageParserOutputHook {
 	public static function onRegistration(): void {
 		global $wgPageImagesOpenGraph, $wgPageImagesOpenGraphFallbackImage;
 
-		if ( $wgPageImagesOpenGraph !== true ) {
-			throw new RuntimeException( '$wgPageImagesOpenGraph must be set to true' );
+		if ( $wgPageImagesOpenGraph !== false ) {
+			throw new RuntimeException( '$wgPageImagesOpenGraph must be set to false' );
 		}
 
 		if ( $wgPageImagesOpenGraphFallbackImage === false ) {
@@ -64,6 +64,7 @@ class Hooks implements OutputPageParserOutputHook {
 			$metaProperties['og:title'] = htmlspecialchars( $outputPage->getDisplayTitle() );
 			$metaProperties['og:type'] = 'article';
 		}
+		$metaProperties['og:image'] = $image;
 		$metaProperties['og:url'] = $outputPage->getCanonicalUrl();
 		if ( $metaProperties['og:url'] === false ) {
 			$metaProperties['og:url'] = $title->getFullURL();
@@ -77,7 +78,7 @@ class Hooks implements OutputPageParserOutputHook {
 		} else {
 			$metaProperties['twitter:title'] = htmlspecialchars( $outputPage->getDisplayTitle() );
 		}
-		$metaProperties['twitter:description'] = $description;
+		$metaProperties['twitter:description'] = mb_strimwidth( $description, 0, 200, "&hellip;" );
 		$metaProperties['twitter:image'] = $image;
 
 		foreach ( $metaProperties as $property => $value ) {
