@@ -31,15 +31,16 @@ class Hooks implements OutputPageParserOutputHook {
 		$description = $parserOutput->getPageProperty( 'description' );
 		$image = PageImages::getPageImage( $title );
 		if ( !$image ) {
+			// fallback URL
 			$image = $outputPage->getConfig()->get( 'PageImagesOpenGraphFallbackImage' );
 		} else {
+			// image URL
 			$image = $image->getFullUrl();
 		}
 		$siteName = $config->get( MainConfigNames::Sitename );
 
 		$metaProperties = [];
 
-		// Open Graph
 		if ( $title->isMainPage() ) {
 			$metaProperties['og:title'] = $siteName;
 			$metaProperties['og:type'] = 'website';
@@ -55,20 +56,9 @@ class Hooks implements OutputPageParserOutputHook {
 		}
 		$metaProperties['og:description'] = $description;
 
-		// Twitter card
-		$metaProperties['twitter:card'] = 'summary';
-		if ( $title->isMainPage() ) {
-			$metaProperties['twitter:title'] = $siteName;
-		} else {
-			$metaProperties['twitter:title'] = htmlspecialchars( $outputPage->getDisplayTitle() );
-		}
-		if ( $description !== null ) {
-			$metaProperties['twitter:description'] = mb_strimwidth( $description, 0, 200, "&hellip;" );
-		}
-		$metaProperties['twitter:image'] = $image;
-
 		foreach ( $metaProperties as $property => $value ) {
 			if ( empty( $value ) ) {
+				// ignore empty properties
 				continue;
 			}
 			$outputPage->addMeta( $property, $value );
