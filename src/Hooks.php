@@ -46,7 +46,7 @@ class Hooks implements OutputPageParserOutputHook {
 			$metaProperties['og:type'] = 'website';
 		} else {
 			$metaProperties['og:site_name'] = $siteName;
-			$metaProperties['og:title'] = htmlspecialchars( $outputPage->getDisplayTitle() );
+			$metaProperties['og:title'] = $outputPage->getDisplayTitle();
 			$metaProperties['og:type'] = 'article';
 		}
 		$metaProperties['og:image'] = $image;
